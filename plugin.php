@@ -1,15 +1,15 @@
 <?php
 /**
- * Plugin Name: jpj-slider — CGB Gutenberg Block Plugin
- * Plugin URI: https://github.com/ahmadawais/create-guten-block/
- * Description: jpj-slider — is a Gutenberg plugin created via create-guten-block.
- * Author: mrahmadawais, maedahbatool
- * Author URI: https://AhmadAwais.com/
+ * Plugin Name: JPJuliao Blocks
+ * Plugin URI: 
+ * Description: A Gutenberg plugin created via create-guten-block.
+ * Author: Juan Pablo Juliao
+ * Author URI: http://jpjuliao.com/
  * Version: 1.0.0
  * License: GPL2+
  * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
  *
- * @package CGB
+ * @package JPJuliao
  */
 
 // Exit if accessed directly.
