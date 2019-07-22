@@ -2,7 +2,11 @@ import './style.scss';
 import './editor.scss';
 
 const { __ } = wp.i18n; // Import __() from wp.i18n
-const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
+const { InspectorControls } = wp.editor;
+const { PanelBody, SelectControl } = wp.components;
+const {
+	registerBlockType,
+} = wp.blocks; // Import registerBlockType() from wp.blocks
 
 /**
  * Register: JPJuliao Tabs Gutenberg Block.
@@ -17,15 +21,24 @@ const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.b
  * @return {?WPBlock}          The block, if it has been successfully
  *                             registered; otherwise `undefined`.
  */
-registerBlockType( 'jpjuliao-tabs', {
-	// Block name. Block names must be string that contains a namespace prefix. Example: my-plugin/my-custom-block.
-	title: __( 'JPJuliao Tabs' ), // Block title.
+registerBlockType( 'jpjuliao-blocks/tabs', {
+	// Block name. Block names must be string that contains a namespace prefix. Example: jpjuliao-block-tabs/my-custom-block.
+	title: __( 'Tabs - JPJuliao Blocks' ), // Block title.
 	icon: 'shield', // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
 	category: 'common', // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
 	keywords: [
 		__( 'JPJuliao' ),
 		__( 'Tabs' ),
 	],
+	attributes: {
+		postType: {
+			type: 'string',
+			default: 'post',
+		},
+		postTypeOptions: {
+			type: 'array',
+		},
+	},
 
 	// eslint-disable-next-line valid-jsdoc
 	/**
@@ -37,12 +50,53 @@ registerBlockType( 'jpjuliao-tabs', {
 	 * @link https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/
 	 */
 	edit: function( props ) {
+		// console.log( props );
+
+		const {
+			attributes: {
+				postType,
+				postTypeOptions,
+			},
+			setAttributes,
+			className,
+			name,
+		} = props;
+
+		if ( ! postTypeOptions ) {
+			fetch('/wp-json/wp/v2/types')
+				.then(res => res.json())
+				.then((types) => {
+					console.log(types);
+					let options = [];
+					for (let i in types) {
+						options.push( { value: types[i].slug, label: types[i].name } );
+					}
+					setAttributes( { postTypeOptions: options } );
+					return options;
+				});
+		}
+
 		// Creates a <p class='wp-block-jpjuliao-block-tabs'></p>.
 		return (
-			<div className={ props.className }>
+			<div className={ className }>
+				<InspectorControls>
+					<PanelBody
+						title={__('Options')}
+						initialOpen={true}
+					>
+						<SelectControl
+							label={ __( 'Select post type:' ) }
+							value={ postType } // e.g: value = [ 'a', 'c' ]
+							onChange={ ( value ) => {
+								setAttributes( { postType: value } );
+							} }
+							options={ postTypeOptions }
+						/>
+					</PanelBody>
+				</InspectorControls>
 				<p>— Hello from the backend.</p>
 				<p>
-					BLOCK: <code>jpjuliao-tabs</code> is a new Gutenberg block
+					BLOCK: <code>{ name }</code> is a new Gutenberg block
 				</p>
 			</div>
 		);
@@ -59,10 +113,13 @@ registerBlockType( 'jpjuliao-tabs', {
 	 */
 	save: function( props ) {
 		return (
-			<div>
+			<div className={ props.className }>
 				<p>— Hello from the frontend.</p>
 				<p>
-					BLOCK: <code>jpjuliao-tabs</code> is a new Gutenberg block.
+					BLOCK: <code>{ props.name } jpjuliao-blocks/tabs</code> is a new Gutenberg block
+				</p>
+				<p>
+					Selected post type: { props.attributes.postType }
 				</p>
 			</div>
 		);
